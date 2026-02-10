@@ -25,7 +25,9 @@ public class CommentRepository {
             .build();
 
     public Optional<Comment> findById(Long id) {
-        String sql = "SELECT * FROM comments WHERE id = ?";
+        final String sql = """
+            SELECT * FROM comments WHERE id = ?
+            """;
         try {
             Comment comment = jdbcTemplate.queryForObject(sql, commentRowMapper, id);
             return Optional.of(comment);
@@ -35,7 +37,9 @@ public class CommentRepository {
     }
 
     public Optional<Comment> findByIdAndPostId(Long id, Long postId) {
-        String sql = "SELECT * FROM comments WHERE id = ? AND post_id = ?";
+        final String sql = """
+            SELECT * FROM comments WHERE id = ? AND post_id = ?
+            """;
         try {
             Comment comment = jdbcTemplate.queryForObject(sql, commentRowMapper, id, postId);
             return Optional.of(comment);
@@ -45,36 +49,61 @@ public class CommentRepository {
     }
 
     public List<Comment> findByPostId(Long postId) {
-        String sql = "SELECT * FROM comments WHERE post_id = ? ORDER BY created_at DESC";
+        final String sql = """
+            SELECT * FROM comments 
+            WHERE post_id = ? 
+            ORDER BY created_at DESC
+            """;
         return jdbcTemplate.query(sql, commentRowMapper, postId);
     }
 
     public int countByPostId(Long postId) {
-        String sql = "SELECT COUNT(*) FROM comments WHERE post_id = ?";
+        final String sql = """
+            SELECT COUNT(*) 
+            FROM comments 
+            WHERE post_id = ?
+            """;
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, postId);
         return count != null ? count : 0;
     }
 
     public Comment save(Comment comment) {
         if (comment.getId() == null) {
-            String sql = "INSERT INTO comments (text, post_id, created_at, updated_at) VALUES (?, ?, ?, ?) RETURNING id";
+            final String sql = """
+                INSERT INTO comments (text, post_id, created_at, updated_at) 
+                VALUES (?, ?, ?, ?) 
+                RETURNING id
+                """;
             Long id = jdbcTemplate.queryForObject(sql, Long.class,
-                    comment.getText(), comment.getPostId(), comment.getCreatedAt(), comment.getUpdatedAt());
+                    comment.getText(),
+                    comment.getPostId(),
+                    comment.getCreatedAt(),
+                    comment.getUpdatedAt());
             comment.setId(id);
         } else {
-            String sql = "UPDATE comments SET text = ?, updated_at = ? WHERE id = ?";
+            final String sql = """
+                UPDATE comments 
+                SET text = ?, updated_at = ? 
+                WHERE id = ?
+                """;
             jdbcTemplate.update(sql, comment.getText(), comment.getUpdatedAt(), comment.getId());
         }
         return comment;
     }
 
     public void deleteById(Long id) {
-        String sql = "DELETE FROM comments WHERE id = ?";
+        final String sql = """
+            DELETE FROM comments 
+            WHERE id = ?
+            """;
         jdbcTemplate.update(sql, id);
     }
 
     public void deleteAllByPostId(Long postId) {
-        String sql = "DELETE FROM comments WHERE post_id = ?";
+        final String sql = """
+            DELETE FROM comments 
+            WHERE post_id = ?
+            """;
         jdbcTemplate.update(sql, postId);
     }
 }

@@ -27,7 +27,9 @@ public class PostRepository {
             .build();
 
     public Optional<Post> findById(Long id) {
-        String sql = "SELECT * FROM posts WHERE id = ?";
+        final String sql = """
+            SELECT * FROM posts WHERE id = ?
+            """;
         try {
             Post post = jdbcTemplate.queryForObject(sql, postRowMapper, id);
             return Optional.of(post);
@@ -37,22 +39,37 @@ public class PostRepository {
     }
 
     public boolean existsById(Long id) {
-        String sql = "SELECT COUNT(*) FROM posts WHERE id = ?";
+        final String sql = """
+            SELECT COUNT(*) 
+            FROM posts 
+            WHERE id = ?
+            """;
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return count != null && count > 0;
     }
 
     public List<Post> findByTitleContainingPaginated(String title, int pageSize, int offset) {
-        String sql = "SELECT * FROM posts WHERE LOWER(title) LIKE LOWER(?) ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        final String sql = """
+            SELECT * FROM posts 
+            WHERE LOWER(title) LIKE LOWER(?) 
+            ORDER BY created_at DESC 
+            LIMIT ? OFFSET ?
+            """;
         return jdbcTemplate.query(sql, postRowMapper, "%" + title + "%", pageSize, offset);
     }
 
     public List<Post> findByTagsPaginated(List<String> tags, int tagCount, int pageSize, int offset) {
-        String placeholders = String.join(",", tags.stream().map(t -> "?").toList());
-        String sql = String.format(
-                "SELECT DISTINCT p.* FROM posts p INNER JOIN post_tags pt ON p.id = pt.post_id WHERE pt.tag IN (%s) GROUP BY p.id HAVING COUNT(DISTINCT pt.tag) = ? ORDER BY p.created_at DESC LIMIT ? OFFSET ?",
-                placeholders
-        );
+        final String placeholders = String.join(",", tags.stream().map(t -> "?").toList());
+        final String sql = String.format("""
+                SELECT DISTINCT p.* 
+                FROM posts p 
+                INNER JOIN post_tags pt ON p.id = pt.post_id 
+                WHERE pt.tag IN (%s) 
+                GROUP BY p.id 
+                HAVING COUNT(DISTINCT pt.tag) = ? 
+                ORDER BY p.created_at DESC 
+                LIMIT ? OFFSET ?
+                """, placeholders);
 
         Object[] params = new Object[tags.size() + 3];
         for (int i = 0; i < tags.size(); i++) {
@@ -66,11 +83,17 @@ public class PostRepository {
     }
 
     public List<Post> findByTitleAndTagsPaginated(String title, List<String> tags, int tagCount, int pageSize, int offset) {
-        String placeholders = String.join(",", tags.stream().map(t -> "?").toList());
-        String sql = String.format(
-                "SELECT DISTINCT p.* FROM posts p INNER JOIN post_tags pt ON p.id = pt.post_id WHERE LOWER(p.title) LIKE LOWER(?) AND pt.tag IN (%s) GROUP BY p.id HAVING COUNT(DISTINCT pt.tag) = ? ORDER BY p.created_at DESC LIMIT ? OFFSET ?",
-                placeholders
-        );
+        final String placeholders = String.join(",", tags.stream().map(t -> "?").toList());
+        final String sql = String.format("""
+                SELECT DISTINCT p.* 
+                FROM posts p 
+                INNER JOIN post_tags pt ON p.id = pt.post_id 
+                WHERE LOWER(p.title) LIKE LOWER(?) AND pt.tag IN (%s) 
+                GROUP BY p.id 
+                HAVING COUNT(DISTINCT pt.tag) = ? 
+                ORDER BY p.created_at DESC 
+                LIMIT ? OFFSET ?
+                """, placeholders);
 
         Object[] params = new Object[tags.size() + 4];
         params[0] = "%" + title + "%";
@@ -85,17 +108,25 @@ public class PostRepository {
     }
 
     public int countByTitleContaining(String title) {
-        String sql = "SELECT COUNT(*) FROM posts WHERE LOWER(title) LIKE LOWER(?)";
+        final String sql = """
+            SELECT COUNT(*) 
+            FROM posts 
+            WHERE LOWER(title) LIKE LOWER(?)
+            """;
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, "%" + title + "%");
         return count != null ? count : 0;
     }
 
     public int countByTags(List<String> tags, int tagCount) {
-        String placeholders = String.join(",", tags.stream().map(t -> "?").toList());
-        String sql = String.format(
-                "SELECT COUNT(DISTINCT p.id) FROM posts p INNER JOIN post_tags pt ON p.id = pt.post_id WHERE pt.tag IN (%s) GROUP BY p.id HAVING COUNT(DISTINCT pt.tag) = ?",
-                placeholders
-        );
+        final String placeholders = String.join(",", tags.stream().map(t -> "?").toList());
+        final String sql = String.format("""
+                SELECT COUNT(DISTINCT p.id) 
+                FROM posts p 
+                INNER JOIN post_tags pt ON p.id = pt.post_id 
+                WHERE pt.tag IN (%s) 
+                GROUP BY p.id 
+                HAVING COUNT(DISTINCT pt.tag) = ?
+                """, placeholders);
 
         Object[] params = new Object[tags.size() + 1];
         for (int i = 0; i < tags.size(); i++) {
@@ -112,11 +143,15 @@ public class PostRepository {
     }
 
     public int countByTitleAndTags(String title, List<String> tags, int tagCount) {
-        String placeholders = String.join(",", tags.stream().map(t -> "?").toList());
-        String sql = String.format(
-                "SELECT COUNT(DISTINCT p.id) FROM posts p INNER JOIN post_tags pt ON p.id = pt.post_id WHERE LOWER(p.title) LIKE LOWER(?) AND pt.tag IN (%s) GROUP BY p.id HAVING COUNT(DISTINCT pt.tag) = ?",
-                placeholders
-        );
+        final String placeholders = String.join(",", tags.stream().map(t -> "?").toList());
+        final String sql = String.format("""
+                SELECT COUNT(DISTINCT p.id) 
+                FROM posts p 
+                INNER JOIN post_tags pt ON p.id = pt.post_id 
+                WHERE LOWER(p.title) LIKE LOWER(?) AND pt.tag IN (%s) 
+                GROUP BY p.id 
+                HAVING COUNT(DISTINCT pt.tag) = ?
+                """, placeholders);
 
         Object[] params = new Object[tags.size() + 2];
         params[0] = "%" + title + "%";
@@ -134,28 +169,51 @@ public class PostRepository {
     }
 
     public List<String> findTagsByPostId(Long postId) {
-        String sql = "SELECT tag FROM post_tags WHERE post_id = ?";
+        final String sql = """
+            SELECT tag 
+            FROM post_tags 
+            WHERE post_id = ?
+            """;
         return jdbcTemplate.queryForList(sql, String.class, postId);
     }
 
     public Post save(Post post) {
         if (post.getId() == null) {
-            String sql = "INSERT INTO posts (title, text, likes_count, image, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
+            final String sql = """
+                INSERT INTO posts (title, text, likes_count, image, created_at, updated_at) 
+                VALUES (?, ?, ?, ?, ?, ?) 
+                RETURNING id
+                """;
             Long id = jdbcTemplate.queryForObject(sql, Long.class,
-                    post.getTitle(), post.getText(), post.getLikesCount(), post.getImage(),
-                    post.getCreatedAt(), post.getUpdatedAt());
+                    post.getTitle(),
+                    post.getText(),
+                    post.getLikesCount(),
+                    post.getImage(),
+                    post.getCreatedAt(),
+                    post.getUpdatedAt());
             post.setId(id);
         } else {
-            String sql = "UPDATE posts SET title = ?, text = ?, likes_count = ?, image = ?, updated_at = ? WHERE id = ?";
+            final String sql = """
+                UPDATE posts 
+                SET title = ?, text = ?, likes_count = ?, image = ?, updated_at = ? 
+                WHERE id = ?
+                """;
             jdbcTemplate.update(sql,
-                    post.getTitle(), post.getText(), post.getLikesCount(), post.getImage(),
-                    post.getUpdatedAt(), post.getId());
+                    post.getTitle(),
+                    post.getText(),
+                    post.getLikesCount(),
+                    post.getImage(),
+                    post.getUpdatedAt(),
+                    post.getId());
         }
         return post;
     }
 
     public void deleteById(Long id) {
-        String sql = "DELETE FROM posts WHERE id = ?";
+        final String sql = """
+            DELETE FROM posts 
+            WHERE id = ?
+            """;
         jdbcTemplate.update(sql, id);
     }
 }

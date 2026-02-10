@@ -4,7 +4,7 @@ REST API для блога на Spring Boot и PostgreSQL.
 
 ## Технологии
 
-Java 21 • Spring Boot 3.2 • PostgreSQL 15 • Gradle 8
+Java 21 • Spring Boot 4.0.2 • PostgreSQL 15 • Maven
 
 ## Установка и запуск
 
@@ -17,21 +17,14 @@ GRANT ALL PRIVILEGES ON DATABASE blogdb TO bloguser;
 ```
 2. Настройте подключение в application.properties
 
-3. Запустите приложение
-
+Сборка и запуск
 ```
-./gradlew bootRun
-API доступно на http://localhost:8080
-```
-
-Сборка
-```
-./gradlew bootJar    # JAR: build/libs/*.jar
-./gradlew bootWar    # WAR: build/libs/*.war
+mvn clean package
+java -jar target/my-blog-back-app-1.0.0.jar
 ```
 Тесты
 ```
-./gradlew test
+mvn test
 ```
 API Endpoints
 Posts:
@@ -75,12 +68,6 @@ curl -X POST http://localhost:8080/api/posts \
 # Добавить лайк
 ```
 curl -X POST http://localhost:8080/api/posts/1/likes
-```
-Деплой
-Tomcat:
-```
-./gradlew bootWar
-cp build/libs/*.war $CATALINA_HOME/webapps/blog.war
 ```
 
 Структура
