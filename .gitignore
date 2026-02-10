@@ -3,18 +3,17 @@
 
 # Log files
 *.log
+logs/
+
+# Maven
+target/
+!target/my-blog-back-app-*.jar
 
 # Package files
 *.jar
 *.war
 *.ear
-
-# Gradle
-.gradle/
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+*.aar
 
 # IntelliJ IDEA
 .idea/
@@ -22,8 +21,6 @@ build/
 *.iml
 *.ipr
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 
 # Eclipse
 .classpath
@@ -34,19 +31,28 @@ bin/
 # VS Code
 .vscode/
 
+# NetBeans
+**/nbproject/private/
+.cache
+
 # MacOS
 .DS_Store
+.DS_Store?
 
 # Windows
 Thumbs.db
-desktop.ini
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
 
 # Test reports
+**/test-results/
+**/target/surefire-reports/
 TEST*.xml
 *.hprof
 
 # Application temporary files
-/tmp/
 *.tmp
 *.bak
 *.swp
@@ -55,11 +61,37 @@ TEST*.xml
 # Environment variables
 .env
 .env.local
+.env.*.local
 
-# H2 database files
+# Database
 *.db
 *.mv.db
 *.trace.db
 
-# Testcontainers
-.testcontainers/
+# Testcontainers properties
+.testcontainers.properties
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# OS generated files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# JetBrains IDE
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/contentModel.xml
+.idea/**/dataSources.ids
+.idea/**/dataSources.xml
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
